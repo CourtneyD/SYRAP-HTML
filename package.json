@@ -1,0 +1,56 @@
+{
+  "name": "syrap-html",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "js-compile-plugins": "babel --presets env js/src/ --out-dir js/dist/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CourtneyD/SYRAP-HTML.git"
+  },
+  "author": "Courtney Daryanani",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.1.2",
+    "babel-preset-env": "^1.6.1",
+    "browser-sync": "^2.23.5",
+    "browserify": "^16.2.3",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-add-src": "^1.0.0",
+    "gulp-autoprefixer": "^4.1.0",
+    "gulp-clean-css": "^4.0.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-imagemin": "^5.0.3",
+    "gulp-inject": "^5.0.2",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-nunjucks-render": "^2.2.2",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-uglify": "^3.0.1",
+    "postcss-uncss": "^0.16.1",
+    "uncss": "^0.16.2",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-paths": "^2.1.0",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "description": "A Simple Yet Rich And Powerful HTML framework that initially integrates Nunjucks, Bootstrap and Gulp to facilitate the build of modular and reusable HTML.",
+  "keywords": [
+    "HTML",
+    "Nunjucks",
+    "Gulp",
+    "Bootstrap",
+    "Framework",
+    "Simple",
+    "Powerful",
+    "Rich"
+  ],
+  "dependencies": {
+    "bootstrap": "^4.3.0",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.7"
+  }
+}
