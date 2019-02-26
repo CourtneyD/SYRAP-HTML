@@ -40,6 +40,7 @@ exports.injectCSS = cssInject;
 
 //exports.compileHTML = HTMLCompile;
 //exports.compileCSS = cssCompile;
+//test
 exports.compressImage = imageCompress;
 
 
