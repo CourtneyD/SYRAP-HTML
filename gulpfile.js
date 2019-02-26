@@ -1,9 +1,4 @@
-"use strict";
-
 const { dest, series, parallel, src, watch } = require('gulp');
-
-//nunjucks HTML templating
-const nunjucksRender  = nunjucksRender = require('gulp-nunjucks-render');
 
 //CSS plugins
 const autoprefixer = require('gulp-autoprefixer');
@@ -19,10 +14,14 @@ const buffer = require('vinyl-buffer');
 //Image plugins
 const imagemin = require('gulp-imagemin');
 
+//nunjucks HTML templating
+const nunjucks = require('gulp-nunjucks-render');
+
 //Utility plugins
 const del = require('del');
 const rename = require('gulp-rename');
 const inject = require('gulp-inject');
+const data = require('gulp-data');
 
 //Browser plugins
 const browserSync = require('browser-sync').create();
@@ -31,13 +30,23 @@ const browserSync = require('browser-sync').create();
 const appSrc = 'src';
 const appDest = 'dist';
 
+exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject);
+
+exports.clean = deleteDist;
+exports.compileSASS = sassCompile;
+exports.compileCSS = cssCompile;
+exports.compileNunjucks = nunjucksCompile;
+exports.injectCSS = cssInject;
+
+//exports.compileHTML = HTMLCompile;
+//exports.compileCSS = cssCompile;
+exports.compressImage = imageCompress;
+
 
 //entirely remove the generated application distribution folder and its contents
-function deleteDist(cb) {
-  del([appDest]);
-  cb()
+function deleteDist() {
+  return del([appDest+'/**', '!'+appDest], {force:true});
 };
-
 
 function liveServer(cb){
   browserSync.init({
@@ -49,36 +58,37 @@ function liveServer(cb){
     notify: true
   });
   watch(appDest+'/**/*', reload);
-  cb()
+  cb();
 }
 
-exports.default = series(buildAssets,HTMLCompile,liveServer);
-exports.resetBuild = deleteDist;
-exports.compileAssets = buildAssets;
-exports.compileHTML = HTMLCompile;
-exports.compileCSS = cssCompile;
-exports.compressImage = imageCompress;
-
-function reload(done) {
+function reload(cb) {
   browserSync.reload();
-  done();
+  cb();
 }
 
-//HTML compilation {inject,pipe}
-function HTMLCompile(cb) {
+function nunjucksCompile() {
+  return src(appSrc+'/pages/**/*.+(html|njk|nunjucks)')
+    //.pipe(data(function(){
+    //  return require('./app/data.json');
+    //}))
+    .pipe(nunjucks({
+      path: [appSrc+'/templates/']
+    }))
+    .pipe(dest(appDest+'/'));
+};
+
+function cssInject() {
   var injectFiles = src([appDest+'/css/*.css']);
   var injectOptions = {
     addRootSlash: false,
     ignorePath: [appSrc, appDest]
   };
-  src(appSrc+'/index.html')
+  return src(appDest+'/*.html')
     .pipe(inject(injectFiles, injectOptions))
-    .pipe(dest(appDest+'/'))
-  cb()
+    .pipe(dest(appDest+'/'));
 }
 
-//CSS compilation {inject,sass,prefix,rename,min,pipe}
-function cssCompile(cb) {
+function sassCompile() {
   var injectAppFiles = src([appSrc+'/scss/components/*.scss', '!'+appSrc+'/scss/app.scss'], {read: false});
   function transformFilepath(filepath) {
     return '@import "' + filepath + '";';
@@ -90,28 +100,26 @@ function cssCompile(cb) {
     addRootSlash: false
   };
   //investigate postcss to remove unused css and reduce impact of bootstrap
-  src(appSrc+'/scss/app.scss')
+  return src(appSrc+'/scss/app.scss')
     .pipe(inject(injectAppFiles, injectAppOptions))
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: ['./src/scss/vendors/bootstrap/','./node_modules/bootstrap/scss'],
     }).on('error', sass.logError))
+    .pipe(dest(appSrc+"/css/"));
+}
+
+function cssCompile() {
+  //investigate postcss to remove unused css and reduce impact of bootstrap
+  return src(appSrc+'/css/app.css')
     .pipe(autoprefixer({
       browsers: ['last 10 versions'],
       cascade: false
     }))
-    .pipe(dest(appSrc+"/css/"))
-    .pipe(rename({ suffix: '.min' }))
     .pipe(cleanCSS())
-    .pipe(dest(appDest+'/css/'))
-  cb()
-}
-
-
-function buildAssets(cb){
-  series(deleteDist,cssCompile);
-  cb()
+    .pipe(rename({ suffix: '.min' }))
+    .pipe(dest(appDest+'/css/'));
 }
 
 function imageCompress(cb){
