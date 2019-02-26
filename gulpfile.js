@@ -30,7 +30,7 @@ const browserSync = require('browser-sync').create();
 const appSrc = 'src';
 const appDest = 'dist';
 
-exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject);
+exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
 
 exports.clean = deleteDist;
 exports.compileSASS = sassCompile;
