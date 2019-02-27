@@ -28,11 +28,11 @@ import data from 'gulp-data';
 import browserSync from 'browser-sync';
 
 
-//paths??
-const appSrc = 'src';
-const appDest = 'dist';
-
-const paths = {
+const path = {
+  base: {
+    src: 'src',
+    dest: 'dist'
+  },
   sass: {
     src: 'src/styles/**/*.less',
     dest: 'assets/styles/'
@@ -57,62 +57,12 @@ const paths = {
 
 exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
 
-exports.clean = deleteDist;
-exports.compileSASS = sassCompile;
-exports.compileCSS = cssCompile;
-exports.compileNunjucks = nunjucksCompile;
-exports.injectCSS = cssInject;
-
-exports.compressImage = imageCompress;
-
-
-//entirely remove the generated application distribution folder and its contents
 export function deleteDist() {
-  return del([appDest+'/**', '!'+appDest], {force:true});
+  return del([path.base.dest+'/**', '!'+path.base.dest], {force:true});
 };
 
-function liveServer(cb){
-  browserSync.init({
-    server: {
-      baseDir: appDest,
-      index: "index.html",
-      directory: false
-    },
-    notify: true
-  });
-  watch(appDest+'/**/*', reload);
-  cb();
-}
-
-function reload(cb) {
-  browserSync.reload();
-  cb();
-}
-
-function nunjucksCompile() {
-  return src(appSrc+'/pages/**/*.+(html|njk|nunjucks)')
-    //.pipe(data(function(){
-    //  return require('./app/data.json');
-    //}))
-    .pipe(nunjucks({
-      path: [appSrc+'/templates/']
-    }))
-    .pipe(dest(appDest+'/'));
-};
-
-function cssInject() {
-  var injectFiles = src([appDest+'/css/*.css']);
-  var injectOptions = {
-    addRootSlash: false,
-    ignorePath: [appSrc, appDest]
-  };
-  return src(appDest+'/*.html')
-    .pipe(inject(injectFiles, injectOptions))
-    .pipe(dest(appDest+'/'));
-}
-
-function sassCompile() {
-  var injectAppFiles = src([appSrc+'/scss/components/*.scss', '!'+appSrc+'/scss/app.scss'], {read: false});
+export function sassCompile() {
+  var injectAppFiles = src([path.base.src+'/scss/components/*.scss', '!'+path.base.src+'/scss/app.scss'], {read: false});
   function transformFilepath(filepath) {
     return '@import "' + filepath + '";';
   }
@@ -123,32 +73,71 @@ function sassCompile() {
     addRootSlash: false
   };
   //investigate postcss to remove unused css and reduce impact of bootstrap
-  return src(appSrc+'/scss/app.scss')
+  return src(path.base.src+'/scss/app.scss')
     .pipe(inject(injectAppFiles, injectAppOptions))
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: ['./src/scss/vendors/bootstrap/','./node_modules/bootstrap/scss'],
     }).on('error', sass.logError))
-    .pipe(dest(appSrc+"/css/"));
+    .pipe(dest(path.base.src+"/css/"));
 }
 
-function cssCompile() {
+export function cssCompile() {
   //investigate postcss to remove unused css and reduce impact of bootstrap
-  return src(appSrc+'/css/app.css')
+  return src(path.base.src+'/css/app.css')
     .pipe(autoprefixer({
       browsers: ['last 10 versions'],
       cascade: false
     }))
     .pipe(cleanCSS())
     .pipe(rename({ suffix: '.min' }))
-    .pipe(dest(appDest+'/css/'));
+    .pipe(dest(path.base.dest+'/css/'));
+}
+
+export function nunjucksCompile() {
+  return src(path.base.src+'/pages/**/*.+(html|njk|nunjucks)')
+    //.pipe(data(function(){
+    //  return require('./app/data.json');
+    //}))
+    .pipe(nunjucks({
+      path: [path.base.src+'/templates/']
+    }))
+    .pipe(dest(path.base.dest+'/'));
+};
+
+export function cssInject() {
+  var injectFiles = src([path.base.dest+'/css/*.css']);
+  var injectOptions = {
+    addRootSlash: false,
+    ignorePath: [path.base.src, path.base.dest]
+  };
+  return src(path.base.dest+'/*.html')
+    .pipe(inject(injectFiles, injectOptions))
+    .pipe(dest(path.base.dest+'/'));
+}
+
+export function liveServer(cb){
+  browserSync.init({
+    server: {
+      baseDir: path.base.dest,
+      index: "index.html",
+      directory: false
+    },
+    notify: true
+  });
+  watch(path.base.dest+'/**/*', reload);
+  cb();
+}
+
+function reload(cb) {
+  browserSync.reload();
+  cb();
 }
 
 function jsCompile(){
   //return src(appSrc+)
 }
-
 
 function imageCompress(cb){
   src('./img/*')
