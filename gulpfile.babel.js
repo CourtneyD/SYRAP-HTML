@@ -1,34 +1,59 @@
-const { dest, series, parallel, src, watch } = require('gulp');
+import  {series,parallel,src,dest,watch} from 'gulp';
 
 //CSS plugins
-const autoprefixer = require('gulp-autoprefixer');
-const cleanCSS = require('gulp-clean-css');
-const sass = require('gulp-sass');
+import autoprefixer from 'gulp-autoprefixer';
+import cleanCSS from 'gulp-clean-css';
+import sass from 'gulp-sass';
 
 //JS plugins
-const concat = require('gulp-concat');
-const uglify = require('gulp-uglify');
-const source = require('vinyl-source-stream');
-const buffer = require('vinyl-buffer');
+import concat from 'gulp-concat';
+import uglify from 'gulp-uglify';
+import browserify from 'browserify';
+import source from 'vinyl-source-stream';
+import buffer from 'vinyl-buffer';
 
 //Image plugins
-const imagemin = require('gulp-imagemin');
+import imagemin from 'gulp-imagemin';
 
 //nunjucks HTML templating
-const nunjucks = require('gulp-nunjucks-render');
+import nunjucks from 'gulp-nunjucks-render';
 
 //Utility plugins
-const del = require('del');
-const rename = require('gulp-rename');
-const inject = require('gulp-inject');
-const data = require('gulp-data');
+import del from 'del';
+import rename from 'gulp-rename';
+import inject from 'gulp-inject';
+import data from 'gulp-data';
 
 //Browser plugins
-const browserSync = require('browser-sync').create();
+import browserSync from 'browser-sync';
+
 
 //paths??
 const appSrc = 'src';
 const appDest = 'dist';
+
+const paths = {
+  sass: {
+    src: 'src/styles/**/*.less',
+    dest: 'assets/styles/'
+  },
+  css: {
+    src: 'src/scripts/**/*.js',
+    dest: 'assets/scripts/'
+  },
+  scripts: {
+    src: 'src/scripts/**/*.js',
+    dest: 'assets/scripts/'
+  },
+  fonts: {
+    src: 'src/scripts/**/*.js',
+    dest: 'assets/scripts/'
+  },
+  nunjucks: {
+    src: 'src/scripts/**/*.js',
+    dest: 'assets/scripts/'
+  }
+};
 
 exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
 
@@ -38,13 +63,11 @@ exports.compileCSS = cssCompile;
 exports.compileNunjucks = nunjucksCompile;
 exports.injectCSS = cssInject;
 
-//exports.compileHTML = HTMLCompile;
-//exports.compileCSS = cssCompile;
 exports.compressImage = imageCompress;
 
 
 //entirely remove the generated application distribution folder and its contents
-function deleteDist() {
+export function deleteDist() {
   return del([appDest+'/**', '!'+appDest], {force:true});
 };
 
@@ -121,6 +144,11 @@ function cssCompile() {
     .pipe(rename({ suffix: '.min' }))
     .pipe(dest(appDest+'/css/'));
 }
+
+function jsCompile(){
+  //return src(appSrc+)
+}
+
 
 function imageCompress(cb){
   src('./img/*')
