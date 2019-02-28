@@ -34,35 +34,37 @@ const path = {
     dest: 'dist'
   },
   sass: {
-    src: 'src/styles/**/*.less',
-    dest: 'assets/styles/'
+    src: 'src/scss/*.scss',
+    dest: 'dist/css/',
+    components: 'src/scss/components/*.scss'
   },
   css: {
-    src: 'src/scripts/**/*.js',
-    dest: 'assets/scripts/'
+    src: 'src/css/*.css,',
+    dest: 'dist/css/'
   },
   scripts: {
     src: 'src/scripts/**/*.js',
     dest: 'assets/scripts/'
   },
-  fonts: {
-    src: 'src/scripts/**/*.js',
-    dest: 'assets/scripts/'
-  },
   nunjucks: {
+    src: 'src/templates/',
+    dest: 'dist/',
+    pages: 'src/pages/**/*.+(html|njk|nunjucks)'
+  },
+  fonts: {
     src: 'src/scripts/**/*.js',
     dest: 'assets/scripts/'
   }
 };
 
-exports.default = series(deleteDist,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
+exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
 
-export function deleteDist() {
+export function clean() {
   return del([path.base.dest+'/**', '!'+path.base.dest], {force:true});
 };
 
 export function sassCompile() {
-  var injectAppFiles = src([path.base.src+'/scss/components/*.scss', '!'+path.base.src+'/scss/app.scss'], {read: false});
+  var injectAppFiles = src([path.sass.components, '!'+path.sass.src], {read: false});
   function transformFilepath(filepath) {
     return '@import "' + filepath + '";';
   }
@@ -73,37 +75,37 @@ export function sassCompile() {
     addRootSlash: false
   };
   //investigate postcss to remove unused css and reduce impact of bootstrap
-  return src(path.base.src+'/scss/app.scss')
+  return src(path.sass.src)
     .pipe(inject(injectAppFiles, injectAppOptions))
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: ['./src/scss/vendors/bootstrap/','./node_modules/bootstrap/scss'],
     }).on('error', sass.logError))
-    .pipe(dest(path.base.src+"/css/"));
+    .pipe(dest(path.sass.dest));
 }
 
 export function cssCompile() {
   //investigate postcss to remove unused css and reduce impact of bootstrap
-  return src(path.base.src+'/css/app.css')
+  return src(path.css.src)
     .pipe(autoprefixer({
       browsers: ['last 10 versions'],
       cascade: false
     }))
     .pipe(cleanCSS())
     .pipe(rename({ suffix: '.min' }))
-    .pipe(dest(path.base.dest+'/css/'));
+    .pipe(dest(path.css.dest));
 }
 
 export function nunjucksCompile() {
-  return src(path.base.src+'/pages/**/*.+(html|njk|nunjucks)')
+  return src(path.nunjucks.pages)
     //.pipe(data(function(){
     //  return require('./app/data.json');
     //}))
     .pipe(nunjucks({
-      path: [path.base.src+'/templates/']
+      path: [path.nunjucks.src]
     }))
-    .pipe(dest(path.base.dest+'/'));
+    .pipe(dest(path.nunjucks.dest));
 };
 
 export function cssInject() {
@@ -114,7 +116,7 @@ export function cssInject() {
   };
   return src(path.base.dest+'/*.html')
     .pipe(inject(injectFiles, injectOptions))
-    .pipe(dest(path.base.dest+'/'));
+    .pipe(dest(path.base.dest));
 }
 
 export function liveServer(cb){
