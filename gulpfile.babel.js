@@ -13,7 +13,7 @@ import browserify from 'browserify';
 import concat from 'gulp-concat';
 import source from 'vinyl-source-stream';
 import uglify from 'gulp-uglify';
-import sourceMaps from 'gulp-sourcemaps';
+import sourcemaps from 'gulp-sourcemaps';
 import watchify from 'watchify';
 
 //Image plugins
@@ -79,22 +79,26 @@ export function sassCompile() {
   };
   return src(path.sass.src)
     .pipe(inject(injectAppFiles, injectAppOptions))
+    .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: [path.sass.vendors+'bootstrap/',path.node.src+'bootstrap/scss'],
     }).on('error', sass.logError))
+    .pipe(sourcemaps.write('.'))
     .pipe(dest(path.sass.dest));
 }
 
 export function cssCompile() {
   return src(path.css.src)
-    .pipe(autoprefixer({
+  .pipe(sourcemaps.init({loadMaps: true}))
+  .pipe(autoprefixer({
       browsers: ['last 10 versions'],
       cascade: false
     }))
     .pipe(cleanCSS())
     .pipe(rename({ suffix: '.min' }))
+    .pipe(sourcemaps.write('.'))
     .pipe(dest(path.css.dest));
 }
 
@@ -147,6 +151,8 @@ export function jsCompile(){
     .pipe(source('app.min.js'))
     .pipe(buffer())
     .pipe(uglify())
+    .pipe(sourcemaps.init({loadMaps: true}))
+    .pipe(sourcemaps.write('./maps'))
     .pipe(dest(path.scripts.dest));
 }
 
