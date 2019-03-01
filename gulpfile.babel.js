@@ -1,3 +1,5 @@
+'use strict';
+
 import  {series,parallel,src,dest,watch} from 'gulp';
 
 //CSS plugins
@@ -6,11 +8,13 @@ import cleanCSS from 'gulp-clean-css';
 import sass from 'gulp-sass';
 
 //JS plugins
-import concat from 'gulp-concat';
-import uglify from 'gulp-uglify';
-import browserify from 'browserify';
-import source from 'vinyl-source-stream';
 import buffer from 'vinyl-buffer';
+import browserify from 'browserify';
+import concat from 'gulp-concat';
+import source from 'vinyl-source-stream';
+import uglify from 'gulp-uglify';
+import sourceMaps from 'gulp-sourcemaps';
+import watchify from 'watchify';
 
 //Image plugins
 import imagemin from 'gulp-imagemin';
@@ -20,9 +24,8 @@ import nunjucks from 'gulp-nunjucks-render';
 
 //Utility plugins
 import del from 'del';
-import rename from 'gulp-rename';
 import inject from 'gulp-inject';
-import data from 'gulp-data';
+import rename from 'gulp-rename';
 
 //Browser plugins
 import browserSync from 'browser-sync';
@@ -35,29 +38,29 @@ const path = {
   },
   sass: {
     src: 'src/scss/*.scss',
-    dest: 'dist/css/',
-    components: 'src/scss/components/*.scss'
+    dest: 'src/css/',
+    components: 'src/scss/components/*.scss',
+    vendors: 'src/scss/vendors/'
   },
   css: {
-    src: 'src/css/*.css,',
+    src: 'src/css/*.css',
     dest: 'dist/css/'
   },
   scripts: {
-    src: 'src/scripts/**/*.js',
-    dest: 'assets/scripts/'
+    src: 'src/js/app.js',
+    dest: 'dist/js/'
   },
   nunjucks: {
     src: 'src/templates/',
     dest: 'dist/',
     pages: 'src/pages/**/*.+(html|njk|nunjucks)'
   },
-  fonts: {
-    src: 'src/scripts/**/*.js',
-    dest: 'assets/scripts/'
+  node: {
+    src: './node_modules/'
   }
 };
 
-exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,cssInject,liveServer);
+exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,jsCompile,assetInject,liveServer);
 
 export function clean() {
   return del([path.base.dest+'/**', '!'+path.base.dest], {force:true});
@@ -74,19 +77,17 @@ export function sassCompile() {
     endtag: '// endinject',
     addRootSlash: false
   };
-  //investigate postcss to remove unused css and reduce impact of bootstrap
   return src(path.sass.src)
     .pipe(inject(injectAppFiles, injectAppOptions))
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
-        includePaths: ['./src/scss/vendors/bootstrap/','./node_modules/bootstrap/scss'],
+        includePaths: [path.sass.vendors+'bootstrap/',path.node.src+'bootstrap/scss'],
     }).on('error', sass.logError))
     .pipe(dest(path.sass.dest));
 }
 
 export function cssCompile() {
-  //investigate postcss to remove unused css and reduce impact of bootstrap
   return src(path.css.src)
     .pipe(autoprefixer({
       browsers: ['last 10 versions'],
@@ -108,7 +109,7 @@ export function nunjucksCompile() {
     .pipe(dest(path.nunjucks.dest));
 };
 
-export function cssInject() {
+export function assetInject() {
   var injectFiles = src([path.base.dest+'/css/*.css']);
   var injectOptions = {
     addRootSlash: false,
@@ -137,8 +138,16 @@ function reload(cb) {
   cb();
 }
 
-function jsCompile(){
-  //return src(appSrc+)
+export function jsCompile(){
+  var bundle = browserify({
+    entries: [path.scripts.src],
+    debug: true
+  });
+  return bundle.bundle()
+    .pipe(source('app.min.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(dest(path.scripts.dest));
 }
 
 function imageCompress(cb){

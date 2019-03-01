@@ -36,13 +36,15 @@
     "gulp-postcss": "^8.0.0",
     "gulp-rename": "^1.2.2",
     "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-uglify": "^3.0.1",
     "jquery": "^3.3.1",
     "nunjucks": "^3.1.7",
     "popper.js": "^1.14.7",
     "vinyl-buffer": "^1.0.1",
     "vinyl-paths": "^2.1.0",
-    "vinyl-source-stream": "^2.0.0"
+    "vinyl-source-stream": "^2.0.0",
+    "watchify": "^3.11.1"
   },
   "description": "A Simple Yet Rich And Powerful HTML framework that initially integrates Nunjucks, Bootstrap and Gulp to facilitate the build of modular and reusable HTML.",
   "keywords": [
@@ -54,5 +56,6 @@
     "Simple",
     "Powerful",
     "Rich"
-  ]
+  ],
+  "dependencies": {}
 }
