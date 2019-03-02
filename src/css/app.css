@@ -7027,13 +7027,13 @@ a.text-dark:hover, a.text-dark:focus {
     Begin layout scss
 */
 body {
-  background-color: blue;
-  margin: 1rem; }
+  background-color: #999;
+  margin: 2rem; }
 
 /*
     Begin panel scss
 */
 .panel {
-  color: blue; }
+  color: #fff; }
 
 /*# sourceMappingURL=app.css.map */

@@ -133,7 +133,9 @@ export function liveServer(cb){
     },
     notify: true
   });
-  watch(path.base.dest+'/**/*', reload);
+  watch('src/scss/**/*.scss', series(sassCompile, cssCompile, reload));
+  watch(['src/templates/**/*.njk','src/pages/**/*.html'], series(nunjucksCompile, assetInject, reload));
+  watch('src/js/**/*.njk', series(jsCompile, reload));
   cb();
 }
 
