@@ -7,5 +7,5 @@ console.log('Can you read this? If so then JS is being bundled. What about some 
 if (typeof $.fn.popover == 'function') {
     console.log('popover loaded. Hooray!');
 }else{
-    console.log('popover failed to load. Boo :|');
+    console.log('popover failed to load. Boohoo :|');
 }

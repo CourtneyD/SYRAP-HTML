@@ -1,6 +1,6 @@
 'use strict';
 
-import  {series,parallel,src,dest,watch} from 'gulp';
+import  {series,parallel,src,dest,watch,lastRun} from 'gulp';
 
 //CSS plugins
 import autoprefixer from 'gulp-autoprefixer';
@@ -60,7 +60,7 @@ const path = {
   }
 };
 
-exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,jsCompile,assetInject,liveServer);
+exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,jsCompile,liveServer);
 
 export function clean() {
   return del([path.base.dest+'/**', '!'+path.base.dest], {force:true});
@@ -83,14 +83,18 @@ export function sassCompile() {
     .pipe(sass({
         outputStyle: 'nested',
         errLogToConsole: true,
-        includePaths: [path.sass.vendors+'bootstrap/',path.node.src+'bootstrap/scss'],
+        includePaths: [
+                        path.node.src+'@fontawesome/fontawesome-free/scss',
+                        path.sass.vendors+'bootstrap/',
+                        path.node.src+'bootstrap/scss'
+                      ],
     }).on('error', sass.logError))
     .pipe(sourcemaps.write('.'))
     .pipe(dest(path.sass.dest));
 }
 
 export function cssCompile() {
-  return src(path.css.src)
+  return src(path.css.src, { since: lastRun(cssCompile) })
   .pipe(sourcemaps.init({loadMaps: true}))
   .pipe(autoprefixer({
       browsers: ['last 10 versions'],
@@ -134,8 +138,8 @@ export function liveServer(cb){
     notify: true
   });
   watch('src/scss/**/*.scss', series(sassCompile, cssCompile, reload));
-  watch(['src/templates/**/*.njk','src/pages/**/*.html'], series(nunjucksCompile, assetInject, reload));
-  watch('src/js/**/*.njk', series(jsCompile, reload));
+  watch(['src/templates/**/*.njk','src/pages/**/*.njk'], series(nunjucksCompile, reload));
+  watch('src/js/**/*.js', series(jsCompile, reload));
   cb();
 }
 
@@ -156,6 +160,11 @@ export function jsCompile(){
     .pipe(sourcemaps.init({loadMaps: true}))
     .pipe(sourcemaps.write('./maps'))
     .pipe(dest(path.scripts.dest));
+}
+
+export function fontCompile(){
+  return src('node_modules/@fontawesome/fontawesome-free/webfonts/*')
+  .pipe(gulp.dest(path.base.dest+'/fonts/'));
 }
 
 function imageCompress(cb){

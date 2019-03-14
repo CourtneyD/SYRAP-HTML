@@ -5,14 +5,29 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- inject:css -->
-    <!-- endinject -->
+    <link rel="stylesheet" href="css/app.min.css">
     <title>{{ title }}</title>
   </head>
   <body>
 
-    {% block content %}
-    {% endblock %}
+      {% block content %}
+      {% endblock %}
+
+    <div class="container">
+      <div class="row">
+        <div class="col-sm">
+          One of three columns
+        </div>
+        <div class="col-sm">
+          One of three columns
+        </div>
+        <div class="col-sm">
+          One of three columns
+        </div>
+      </div>
+    </div>
+
+
 
     <!-- Optional JavaScript -->
     <script src="js/app.min.js"></script>
