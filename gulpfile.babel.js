@@ -84,7 +84,7 @@ export function sassCompile() {
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: [
-                        path.node.src+'@fontawesome/fontawesome-free/scss',
+                        //path.node.src+'@fortawesome/fontawesome-free/scss',
                         path.sass.vendors+'bootstrap/',
                         path.node.src+'bootstrap/scss'
                       ],
