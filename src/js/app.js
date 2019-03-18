@@ -1,6 +1,7 @@
 window.jQuery = $ = require("jquery");
 require("popper.js");
 require('bootstrap');
+//require('tarteaucitronjs');
 
 console.log('Can you read this? If so then JS is being bundled. What about some bootstrap stuff to show that Browserify has worked?')
 

@@ -60,7 +60,7 @@ const path = {
   }
 };
 
-exports.default = series(clean,sassCompile,cssCompile,nunjucksCompile,jsCompile,liveServer);
+exports.default = series(clean, parallel(series(sassCompile,cssCompile,nunjucksCompile,jsCompile),fontCompile), liveServer);
 
 export function clean() {
   return del([path.base.dest+'/**', '!'+path.base.dest], {force:true});
@@ -84,8 +84,8 @@ export function sassCompile() {
         outputStyle: 'nested',
         errLogToConsole: true,
         includePaths: [
-                        //path.node.src+'@fortawesome/fontawesome-free/scss',
                         path.sass.vendors+'bootstrap/',
+                        path.node.src+'@fortawesome/fontawesome-free/scss',
                         path.node.src+'bootstrap/scss'
                       ],
     }).on('error', sass.logError))
@@ -163,8 +163,8 @@ export function jsCompile(){
 }
 
 export function fontCompile(){
-  return src('node_modules/@fontawesome/fontawesome-free/webfonts/*')
-  .pipe(gulp.dest(path.base.dest+'/fonts/'));
+  return src(path.node.src+'@fortawesome/fontawesome-free/webfonts/*')
+  .pipe(dest(path.base.dest+'/fonts/'));
 }
 
 function imageCompress(cb){
