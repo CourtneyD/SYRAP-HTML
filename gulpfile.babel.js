@@ -50,6 +50,10 @@ const path = {
     src: 'src/js/app.js',
     dest: 'dist/js/'
   },
+  fonts: {
+    src: 'src/@fortawesome/fontawesome-free/webfonts/*',
+    dest: 'src/webfonts/'
+  },
   nunjucks: {
     src: 'src/templates/',
     dest: 'dist/',
@@ -163,8 +167,8 @@ export function jsCompile(){
 }
 
 export function fontCompile(){
-  return src(path.node.src+'@fortawesome/fontawesome-free/webfonts/*')
-  .pipe(dest(path.base.dest+'/fonts/'));
+  return src(path.fonts.src)
+  .pipe(dest(path.fonts.dest));
 }
 
 function imageCompress(cb){

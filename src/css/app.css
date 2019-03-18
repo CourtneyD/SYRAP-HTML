@@ -13461,8 +13461,7 @@ a.text-dark:hover, a.text-dark:focus {
     Begin layout scss
 */
 body {
-  background-color: #e9caca;
-  margin: 2rem 0.5rem; }
+  background-color: #e9caca; }
 
 /*
     Begin panel scss
