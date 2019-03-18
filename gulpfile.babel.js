@@ -33,31 +33,31 @@ import browserSync from 'browser-sync';
 
 const path = {
   base: {
-    src: 'src',
-    dest: 'dist'
+    src: './src',
+    dest: './dist'
   },
   sass: {
-    src: 'src/scss/*.scss',
-    dest: 'src/css/',
-    components: 'src/scss/components/*.scss',
-    vendors: 'src/scss/vendors/'
+    src: './src/scss/*.scss',
+    dest: './src/css',
+    components: './src/scss/components/*.scss',
+    vendors: './src/scss/vendors/'
   },
   css: {
-    src: 'src/css/*.css',
-    dest: 'dist/css/'
+    src: './src/css/*.css',
+    dest: './dist/css'
   },
   scripts: {
-    src: 'src/js/app.js',
-    dest: 'dist/js/'
+    src: './src/js/app.js',
+    dest: './dist/js'
   },
   fonts: {
-    src: 'src/@fortawesome/fontawesome-free/webfonts/*',
-    dest: 'src/webfonts/'
+    src: './node_modules/@fortawesome/fontawesome-free/webfonts/*',
+    dest: './dist/webfonts'
   },
   nunjucks: {
-    src: 'src/templates/',
-    dest: 'dist/',
-    pages: 'src/pages/**/*.+(html|njk|nunjucks)'
+    src: './src/templates/',
+    dest: './dist',
+    pages: './src/pages/**/*.+(html|njk|nunjucks)'
   },
   node: {
     src: './node_modules/'
